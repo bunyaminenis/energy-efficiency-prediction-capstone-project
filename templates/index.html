@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Energy Efficiency Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --bg-card: #181b24;
+            --bg-subtle: #252830;
+            --text: #e8eaed;
+            --text-dim: #8b8fa3;
+            --accent: #60a5fa;
+            --heat: #f97316;
+            --cool: #38bdf8;
+            --border: #2a2d38;
+            --green: #059669;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 24px 16px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* Header */
+        .header { text-align: center; margin-bottom: 32px; }
+        .header .tag {
+            font-size: 11px; font-weight: 600; letter-spacing: 0.15em;
+            color: var(--accent); text-transform: uppercase; margin-bottom: 6px;
+        }
+        .header h1 { font-size: 28px; font-weight: 800; line-height: 1.2; }
+        .header .gradient {
+            background: linear-gradient(90deg, var(--heat), var(--cool));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .header p { color: var(--text-dim); font-size: 13px; margin-top: 8px; }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card); border-radius: 12px;
+            padding: 20px; border: 1px solid var(--border);
+        }
+        .results-row { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+        .results-row .card { flex: 1; min-width: 260px; }
+
+        /* Gauge */
+        .gauge-label {
+            font-size: 13px; font-weight: 600; color: var(--text-dim);
+            letter-spacing: 0.05em; text-transform: uppercase;
+        }
+        .gauge-rating {
+            font-size: 11px; font-weight: 700; color: #fff;
+            padding: 2px 8px; border-radius: 4px;
+        }
+        .gauge-value {
+            font-size: 36px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+            line-height: 1; margin-top: 8px;
+        }
+        .gauge-unit { font-size: 14px; font-weight: 400; color: var(--text-dim); margin-left: 4px; }
+        .gauge-bar {
+            margin-top: 10px; height: 8px; border-radius: 4px;
+            background: var(--bg-subtle); overflow: hidden;
+        }
+        .gauge-fill {
+            height: 100%; border-radius: 4px; transition: width 0.4s ease;
+        }
+
+        /* Model selector */
+        .model-row {
+            display: flex; gap: 16px; margin-bottom: 24px; align-items: center;
+            flex-wrap: wrap;
+        }
+        .model-row label { font-size: 13px; font-weight: 600; color: var(--text-dim); }
+        .model-row select {
+            background: var(--bg-subtle); color: var(--text); border: 1px solid var(--border);
+            border-radius: 8px; padding: 8px 12px; font-size: 13px;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+        }
+        .model-row select:focus { outline: none; border-color: var(--accent); }
+
+        /* Total */
+        .total-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 24px; padding: 14px 20px;
+        }
+        .total-label { font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+        .total-value { font-size: 24px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+
+        /* Sliders */
+        .section-title {
+            font-size: 15px; font-weight: 700; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .title-bar { display: inline-block; width: 3px; height: 16px; border-radius: 2px; background: var(--accent); }
+        .sliders-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 8px 32px;
+        }
+        .slider-group { margin-bottom: 16px; }
+        .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .slider-header label { font-size: 13px; font-weight: 600; }
+        .slider-val {
+            font-size: 13px; font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; color: var(--accent); min-width: 70px; text-align: right;
+        }
+        input[type="range"] { width: 100%; accent-color: var(--accent); }
+        .slider-range {
+            display: flex; justify-content: space-between;
+            font-size: 10px; color: var(--text-dim); margin-top: 2px;
+        }
+
+        /* Metrics table */
+        .metrics-card { margin-top: 24px; overflow-x: auto; }
+        .metrics-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th {
+            text-align: left; padding: 8px 12px; font-weight: 600;
+            color: var(--text-dim); border-bottom: 1px solid var(--border);
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        td { padding: 8px 12px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        tr:hover td { background: var(--bg-subtle); }
+        .best-row td { color: var(--green); font-weight: 700; }
+
+        /* Status */
+        .status {
+            text-align: center; padding: 40px; color: var(--text-dim); font-size: 14px;
+        }
+        .loading::after {
+            content: ''; display: inline-block; width: 16px; height: 16px;
+            border: 2px solid var(--accent); border-top-color: transparent;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+            margin-left: 8px; vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Footer */
+        .footer { text-align: center; margin-top: 24px; font-size: 11px; color: var(--text-dim); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="tag">Bahçeşehir University — Capstone Project</div>
+            <h1>Building Energy Efficiency<br><span class="gradient">Prediction System</span></h1>
+            <p>Adjust building parameters to predict heating & cooling loads using ML models</p>
+        </div>
+
+        <!-- Model selector -->
+        <div class="model-row card" style="margin-bottom: 24px">
+            <label>Active Model:</label>
+            <select id="modelSelect">
+                <option value="linear">Linear Regression</option>
+                <option value="ridge">Ridge Regression</option>
+                <option value="decision_tree">Decision Tree</option>
+                <option value="random_forest" selected>Random Forest</option>
+                <option value="knn">K-Nearest Neighbors</option>
+            </select>
+            <span id="statusText" style="font-size: 12px; color: var(--green);">● Models Ready</span>
+        </div>
+
+        <!-- Results gauges -->
+        <div class="results-row">
+            <div class="card" id="heatingCard">
+                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px">
+                    <span class="gauge-label">Heating Load</span>
+                    <span class="gauge-rating" id="heatingRating">A</span>
+                </div>
+                <div class="gauge-value" style="color:var(--heat)">
+                    <span id="heatingVal">0.0</span><span class="gauge-unit">kWh/m²</span>
+                </div>
+                <div class="gauge-bar"><div class="gauge-fill" id="heatingBar" style="background:linear-gradient(90deg,#f9731688,var(--heat));width:0%"></div></div>
+            </div>
+            <div class="card" id="coolingCard">
+                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px">
+                    <span class="gauge-label">Cooling Load</span>
+                    <span class="gauge-rating" id="coolingRating">A</span>
+                </div>
+                <div class="gauge-value" style="color:var(--cool)">
+                    <span id="coolingVal">0.0</span><span class="gauge-unit">kWh/m²</span>
+                </div>
+                <div class="gauge-bar"><div class="gauge-fill" id="coolingBar" style="background:linear-gradient(90deg,#38bdf888,var(--cool));width:0%"></div></div>
+            </div>
+        </div>
+
+        <!-- Total -->
+        <div class="card total-bar">
+            <span class="total-label">Total Energy Load</span>
+            <div class="total-value">
+                <span id="totalVal">0.0</span> <span class="gauge-unit">kWh/m²</span>
+            </div>
+        </div>
+
+        <!-- Sliders -->
+        <div class="card" style="margin-bottom: 24px">
+            <div class="section-title"><span class="title-bar"></span> Building Characteristics</div>
+            <div class="sliders-grid" id="slidersContainer"></div>
+            <div id="orientationLabel" style="margin-top:8px; font-size:12px; color:var(--text-dim)"></div>
+        </div>
+
+        <!-- Metrics table -->
+        <div class="card metrics-card">
+            <h3><span class="title-bar"></span> Model Comparison (Test Set Metrics)</h3>
+            <div id="metricsContainer"><div class="status loading">Loading evaluation results...</div></div>
+        </div>
+
+        <div class="footer">
+            Capstone Project — Energy Efficiency Prediction for Buildings<br>
+            Software Engineering & Civil Engineering, Bahçeşehir University, 2021
+        </div>
+    </div>
+
+    <script>
+        // Feature definitions
+        const FEATURES = [
+            { key: "relative_compactness", label: "Relative Compactness", min: 0.62, max: 0.98, step: 0.01, value: 0.76, unit: "" },
+            { key: "surface_area", label: "Surface Area", min: 514, max: 808, step: 1, value: 661, unit: "m²" },
+            { key: "wall_area", label: "Wall Area", min: 245, max: 416, step: 1, value: 318, unit: "m²" },
+            { key: "roof_area", label: "Roof Area", min: 110, max: 220, step: 1, value: 176, unit: "m²" },
+            { key: "overall_height", label: "Overall Height", min: 3.5, max: 7.0, step: 0.5, value: 5.25, unit: "m" },
+            { key: "orientation", label: "Orientation", min: 2, max: 5, step: 1, value: 3, unit: "" },
+            { key: "glazing_area", label: "Glazing Area", min: 0, max: 0.40, step: 0.05, value: 0.25, unit: "ratio" },
+            { key: "glazing_area_distribution", label: "Glazing Distribution", min: 0, max: 5, step: 1, value: 3, unit: "" },
+        ];
+
+        const ORIENTATIONS = { 2: "North", 3: "East", 4: "South", 5: "West" };
+        let currentValues = {};
+        let debounceTimer = null;
+
+        // Build sliders
+        function buildSliders() {
+            const container = document.getElementById("slidersContainer");
+            FEATURES.forEach(f => {
+                currentValues[f.key] = f.value;
+                const isInt = Number.isInteger(f.step);
+                const displayVal = isInt ? f.value : f.value.toFixed(2);
+
+                container.innerHTML += `
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <label>${f.label}</label>
+                            <span class="slider-val" id="val_${f.key}">${displayVal} ${f.unit}</span>
+                        </div>
+                        <input type="range" id="slider_${f.key}" min="${f.min}" max="${f.max}" step="${f.step}" value="${f.value}"
+                               oninput="onSliderChange('${f.key}', this.value, ${isInt}, '${f.unit}')">
+                        <div class="slider-range"><span>${f.min}${f.unit}</span><span>${f.max}${f.unit}</span></div>
+                    </div>`;
+            });
+        }
+
+        function onSliderChange(key, val, isInt, unit) {
+            val = parseFloat(val);
+            currentValues[key] = val;
+            const display = isInt ? val : val.toFixed(2);
+            document.getElementById(`val_${key}`).textContent = `${display} ${unit}`;
+
+            // Update orientation label
+            const ori = currentValues.orientation;
+            const gad = currentValues.glazing_area_distribution;
+            document.getElementById("orientationLabel").textContent =
+                `Orientation: ${ORIENTATIONS[ori] || ori} | Glazing Dist: ${gad === 0 ? "None" : "Pattern " + gad}`;
+
+            // Debounced API call
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(fetchPrediction, 150);
+        }
+
+        // Fetch prediction from Flask API
+        async function fetchPrediction() {
+            const model = document.getElementById("modelSelect").value;
+            try {
+                const resp = await fetch("/api/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(currentValues),
+                });
+                const data = await resp.json();
+                if (data.error) { console.error(data.error); return; }
+
+                const h = data.heating?.[model] ?? 0;
+                const c = data.cooling?.[model] ?? 0;
+                updateGauges(h, c);
+            } catch (e) {
+                console.error("Prediction failed:", e);
+            }
+        }
+
+        function getRating(val) {
+            if (val < 15) return ["A", "#059669"];
+            if (val < 20) return ["B", "#10b981"];
+            if (val < 25) return ["C", "#f59e0b"];
+            if (val < 30) return ["D", "#f97316"];
+            if (val < 35) return ["E", "#ef4444"];
+            return ["F", "#991b1b"];
+        }
+
+        function updateGauges(h, c) {
+            document.getElementById("heatingVal").textContent = h.toFixed(1);
+            document.getElementById("coolingVal").textContent = c.toFixed(1);
+            document.getElementById("totalVal").textContent = (h + c).toFixed(1);
+
+            document.getElementById("heatingBar").style.width = `${Math.min(100, (h / 45) * 100)}%`;
+            document.getElementById("coolingBar").style.width = `${Math.min(100, (c / 48) * 100)}%`;
+
+            const [hr, hc] = getRating(h);
+            const [cr, cc] = getRating(c);
+            const heatingRating = document.getElementById("heatingRating");
+            const coolingRating = document.getElementById("coolingRating");
+            heatingRating.textContent = `Rating ${hr}`;
+            heatingRating.style.background = hc;
+            coolingRating.textContent = `Rating ${cr}`;
+            coolingRating.style.background = cc;
+        }
+
+        // Load metrics table
+        async function loadMetrics() {
+            try {
+                const resp = await fetch("/api/results");
+                const data = await resp.json();
+                if (data.error) {
+                    document.getElementById("metricsContainer").innerHTML = `<div class="status">${data.error}</div>`;
+                    return;
+                }
+                renderMetrics(data);
+            } catch (e) {
+                document.getElementById("metricsContainer").innerHTML = `<div class="status">Could not load metrics.</div>`;
+            }
+        }
+
+        function renderMetrics(data) {
+            let html = "";
+            for (const [target, models] of Object.entries(data)) {
+                const metrics = ["R2", "MAE", "RMSE", "MSE", "MBE", "CV", "MAPE"];
+
+                // Find best R2
+                let bestModel = null, bestR2 = -Infinity;
+                for (const [m, vals] of Object.entries(models)) {
+                    if (vals.R2 > bestR2) { bestR2 = vals.R2; bestModel = m; }
+                }
+
+                html += `<h4 style="margin:16px 0 8px; font-size:13px; color:var(--${target === 'heating' ? 'heat' : 'cool'}); text-transform:uppercase; letter-spacing:0.05em">${target} Load</h4>`;
+                html += `<table><thead><tr><th>Model</th>`;
+                metrics.forEach(m => html += `<th>${m}</th>`);
+                html += `</tr></thead><tbody>`;
+
+                for (const [modelKey, vals] of Object.entries(models)) {
+                    const isBest = modelKey === bestModel;
+                    html += `<tr class="${isBest ? 'best-row' : ''}"><td>${modelKey}</td>`;
+                    metrics.forEach(m => html += `<td>${vals[m]?.toFixed(4) ?? '-'}</td>`);
+                    html += `</tr>`;
+                }
+                html += `</tbody></table>`;
+            }
+            document.getElementById("metricsContainer").innerHTML = html;
+        }
+
+        // Model selector change
+        document.getElementById("modelSelect").addEventListener("change", fetchPrediction);
+
+        // Init
+        buildSliders();
+        fetchPrediction();
+        loadMetrics();
+    </script>
+</body>
+</html>
