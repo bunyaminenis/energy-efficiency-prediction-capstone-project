@@ -19,9 +19,10 @@ The system trains and compares **10 different ML models**, evaluates them with *
 
 ## 🖥️ Screenshots
 
-<!-- Add your screenshots here after running the app -->
-<!-- ![Web UI](screenshots/web_ui.png) -->
-<!-- ![Results](screenshots/results_chart.png) -->
+<img width="1280" height="800" alt="Screenshot_2" src="https://github.com/user-attachments/assets/d99a4545-6221-4b2c-bcf5-ffcc6da26f1b" />
+<img width="957" height="317" alt="Screenshot_3" src="https://github.com/user-attachments/assets/7a06d80d-5907-4c8b-a80b-fd17aaa34ce5" />
+<img width="956" height="315" alt="Screenshot_4" src="https://github.com/user-attachments/assets/81584104-c375-45dc-8692-0fe30c0b96fc" />
+<img width="987" height="593" alt="Screenshot_5" src="https://github.com/user-attachments/assets/70df357b-16bd-447f-b775-3666effb46c5" />
 
 *Run `python app.py` and open http://localhost:5000 to see the interactive prediction dashboard.*
 
@@ -58,8 +59,8 @@ The system trains and compares **10 different ML models**, evaluates them with *
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/energy-efficiency-prediction.git
-cd energy-efficiency-prediction
+git clone https://github.com/bunyaminenis/energy-efficiency-prediction-capstone-project.git
+cd energy-efficiency-prediction-capstone-project
 
 # Install dependencies
 pip install -r requirements.txt
@@ -141,16 +142,16 @@ Compatible with the [UCI Energy Efficiency Dataset](https://archive.ics.uci.edu/
 ## 👥 Team
 
 **Software Engineering**
-- Ahmetcan Filiz (1730456)
-- Bünyamin Enis Kara (1407185)
-- Muhammet Torlak (1244574)
+- A***** F***** (*******)
+- Bünyamin Enis Kara (*******)
+- M***** T***** (*******)
 
 **Civil Engineering**
-- Mohamad Kharroub (1906886)
-- Khaled Alyasin (1802021)
-- Mohanad Sikh (1900876)
+- M***** K***** (*******)
+- K***** A***** (*******)
+- M***** S***** (*******)
 
-**Advisors:** Derya Bodur (Software Eng.) · Habib Cem Yenidoğan (Civil Eng.)
+**Advisors:** D***** B***** (Software Eng.) · H***** C***** Y***** (Civil Eng.)
 
 ## 📄 License
 
@@ -160,4 +161,4 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 - Bahçeşehir University, Faculty of Engineering and Natural Sciences
 - [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/energy+efficiency) for the Energy Efficiency Dataset
-- Dr. Derya Bodur and Dr. Habib Cem Yenidoğan for their guidance
+- Dr. D***** B***** and Dr. H***** C***** Y***** for their guidance
