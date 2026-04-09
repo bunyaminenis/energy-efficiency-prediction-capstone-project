@@ -166,6 +166,7 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 ## ⚠️ Note
 
 The original project report and research were completed by the team in 2021.
-The code implementation was generated with AI assistance (Claude by Anthropic)
-based on the original project proposal. The author is actively studying
-data science and machine learning to fully understand the codebase.
+The ML pipeline code was generated with AI assistance (Claude by Anthropic)
+based on the original project proposal and requirements.
+The Flask web application and backend integration were developed by Bünyamin Enis Kara(me),
+drawing on post-graduation experience with Flask and Bootstrap.
