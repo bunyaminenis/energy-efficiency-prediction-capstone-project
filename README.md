@@ -162,3 +162,10 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 - Bahçeşehir University, Faculty of Engineering and Natural Sciences
 - [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/energy+efficiency) for the Energy Efficiency Dataset
 - Dr. D***** B***** and Dr. H***** C***** Y***** for their guidance
+
+## ⚠️ Note
+
+The original project report and research were completed by the team in 2021.
+The code implementation was generated with AI assistance (Claude by Anthropic)
+based on the original project proposal. The author is actively studying
+data science and machine learning to fully understand the codebase.
